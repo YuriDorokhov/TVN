@@ -1542,15 +1542,16 @@ body {
   const fieldRows = [];
 
   /**
-   * Flags which way each village moved over the selected window, so the draw loop only has to read
-   * a number. Recomputed whenever the window changes.
+   * Which way each village moved on the newest day in the data, so the draw loop only has to read a
+   * number. Deliberately not tied to the Changed window: the ring answers "did this move since the
+   * last import", and summing a wider window would ring a village that has sat still for a fortnight
+   * on the strength of one gain at the start of it.
    */
   function refreshTrend() {
-    const since = changeDays === 0 ? -Infinity : NEWEST - (changeDays - 1) * 86400000;
     for (const village of list) {
       let total = 0;
       for (const [day, delta] of village.history) {
-        if (DATE_MS[day] >= since) total += delta;
+        if (DATE_MS[day] === NEWEST) total += delta;
       }
 
       village.trend = Math.sign(total);
@@ -1949,7 +1950,6 @@ body {
     changeDays = Number(event.target.value) || 0;
     // Over "any time" there is nothing to have changed within, so the choice has no meaning.
     $('changeMode').disabled = changeDays === 0;
-    refreshTrend();
     refreshChangeCount();
     refreshMinPopLabel(); // its count follows whatever is visible
     schedule();
