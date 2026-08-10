@@ -753,7 +753,7 @@ body {
         <div class="filter-list" id="spotList">
           <div class="section">Valley type</div>
           <div id="spotFields"></div>
-          <div class="section">With an oasis within 3 tiles &mdash; all of them</div>
+          <div class="section">With an oasis within 3 tiles &mdash; any of them</div>
           <div id="spotOases"></div>
         </div>
       </div>
@@ -1720,7 +1720,8 @@ body {
         const key = t.gridRow * COLS + t.col;
         if (byIndex.has(key)) continue;                                  // already settled
         if (spotFieldSet.size > 0 && !spotFieldSet.has(t.layoutIndex)) continue;
-        if (required !== 0 && ((reachMask.get(key) || 0) & required) !== required) continue;
+        // Any one of the ticked types is enough - the bitmask only has to overlap, not cover.
+        if (required !== 0 && ((reachMask.get(key) || 0) & required) === 0) continue;
         spots.add(key);
       }
     }
